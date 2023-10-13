@@ -15,7 +15,6 @@ export default function SignInSide() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(loginType, "loginType")
         let {user} = {};
         if(loginType == "email"){
             user = await login(authService, email, password);
@@ -24,16 +23,14 @@ export default function SignInSide() {
                 .then(async (result) => {
                     // This gives you a Google Access Token. You can use it to access the Google API.
                     console.log(result, "result");
-                    let never = await googleLogIn(authService, provider);
-                    console.log(never, "never");
-                    const resultUrl = await redirectResult(authService);
-                    console.log(resultUrl, "resultUrl");
+                    user = await googleLogIn(authService, provider);
                 }).catch((error) => {
                 // Handle Errors here.
                 const errorMessage = error.message;
                 alert(errorMessage);
             });
         }
+        console.log(user, "login User");
     };
 
     return (
