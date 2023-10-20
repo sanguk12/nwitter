@@ -12,6 +12,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {useRef, useCallback} from "react";
+import {authService, signIn} from "../fbase";
 
 function Copyright(props) {
     return (
@@ -31,13 +33,27 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-    const handleSubmit = (event) => {
+    const pwCheckValue = useRef();
+    const passWordValue = useRef();
+    const pwValue = (e) => {
+        pwCheckValue.current = e.target.value;
+        console.log(pwCheckValue.current, "pwCheckValue")
+    };
+    const pwCheck = (e) => {
+        passWordValue.current = e.target.value;
+        console.log(passWordValue.current, "passWordValue")
+        // checkPw()
+    };
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         console.log({
             email: data.get('email'),
             password: data.get('password'),
         });
+        let user = await signIn(authService,data.get('email'), data.get('password'));
+        console.log(user,"22")
     };
 
     return (
@@ -79,18 +95,21 @@ export default function SignUp() {
                                     type="password"
                                     id="password"
                                     autoComplete="new-password"
+                                    onChange={pwValue}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    label="Confirm Password"
-                                    type="password"
-                                    id="ConfirmPassword"
-                                    autoComplete="new-password"
-                                />
-                            </Grid>
+                            {/*<Grid item xs={12}>*/}
+                            {/*    <TextField*/}
+                            {/*        required*/}
+                            {/*        fullWidth*/}
+                            {/*        label="Confirm Password"*/}
+                            {/*        type="password"*/}
+                            {/*        id="ConfirmPassword"*/}
+                            {/*        autoComplete="new-password"*/}
+                            {/*        onChange={pwCheck}*/}
+                            {/*    />*/}
+                            {/*</Grid>*/}
+                            {/*{checkPw()}*/}
                             <Grid item xs={12}>
                                 <FormControlLabel
                                     control={<Checkbox value="allowExtraEmails" color="primary" />}
