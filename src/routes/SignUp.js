@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {useRef, useCallback} from "react";
+import {useRef, useEffect, useState} from "react";
 import {authService, signIn} from "../fbase";
 
 function Copyright(props) {
@@ -35,25 +35,28 @@ const defaultTheme = createTheme();
 export default function SignUp() {
     const pwCheckValue = useRef();
     const passWordValue = useRef();
-    const pwValue = (e) => {
+    const [passwordMatch, setPasswordMatch] = useState(true);
+    const pwValue = async (e) => {
         pwCheckValue.current = e.target.value;
-        console.log(pwCheckValue.current, "pwCheckValue")
+        passWordConfirm();
     };
-    const pwCheck = (e) => {
+    const pwCheck = async (e) => {
         passWordValue.current = e.target.value;
-        console.log(passWordValue.current, "passWordValue")
-        // checkPw()
+        passWordConfirm();
     };
-
+    const passWordConfirm = () => {
+        const passwordsMatch = pwCheckValue.current === passWordValue.current;
+        setPasswordMatch(passwordsMatch);
+    }
     const handleSubmit = async (event) => {
+        if(!passwordMatch){
+            alert("비밀번호를 확인해 주세요.")
+            return;
+        }
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
-        let user = await signIn(authService,data.get('email'), data.get('password'));
-        console.log(user,"22")
+        let user = await signIn(authService, data.get('email'), data.get('password'));
+        console.log(user,"회원가입 ㅇㅂㅇ")
     };
 
     return (
@@ -98,18 +101,22 @@ export default function SignUp() {
                                     onChange={pwValue}
                                 />
                             </Grid>
-                            {/*<Grid item xs={12}>*/}
-                            {/*    <TextField*/}
-                            {/*        required*/}
-                            {/*        fullWidth*/}
-                            {/*        label="Confirm Password"*/}
-                            {/*        type="password"*/}
-                            {/*        id="ConfirmPassword"*/}
-                            {/*        autoComplete="new-password"*/}
-                            {/*        onChange={pwCheck}*/}
-                            {/*    />*/}
-                            {/*</Grid>*/}
-                            {/*{checkPw()}*/}
+                            <Grid item xs={12}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    label="Confirm Password"
+                                    type="password"
+                                    id="ConfirmPassword"
+                                    autoComplete="new-password"
+                                    onChange={pwCheck}
+                                />
+                            </Grid>
+                            {!passwordMatch && (
+                                <>
+                                    <span className="formAlert">비밀번호가 일치하지 않습니다.</span>
+                                </>
+                            )}
                             <Grid item xs={12}>
                                 <FormControlLabel
                                     control={<Checkbox value="allowExtraEmails" color="primary" />}
